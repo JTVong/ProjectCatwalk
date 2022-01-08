@@ -8,7 +8,7 @@
   "scripts": {
     "start": "nodemon server/index.js",
     "start-prod": "node server/index.js",
-    "react-dev": "webpack -w",
+    "react-dev": "webpack --config ./webpack.dev.config.js -w",
     "react-prod": "webpack",
     "test": "jest",
     "clean": "kill -9 $(lsof -t -i:3030)"
