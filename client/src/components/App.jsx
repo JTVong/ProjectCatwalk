@@ -50,7 +50,7 @@ const App = function () {
         <hr/>
         <QAsection product_id={currentProduct.id} product_name={currentProduct.name} />
         <hr/>
-//         <RnRApp productId = {productId} />
+     //<RnRApp productId = {productId} />
       </MainContainer>
     </div>
   )
