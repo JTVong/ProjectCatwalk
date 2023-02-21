@@ -11,8 +11,8 @@ const SearchBar = ({ questions, searchResult }) => {
     );
   }, [questions, searchTerm]);
 
-  // Memoize debounce function to prevent it from being recreated on every re-render
-  const debounce = useCallback((func, delay) => {
+  // Memoize delayed func to prevent it from being recreated on every re-render
+  const delayed = useCallback((func, delay) => {
     let timeout;
     return function (...args) {
       clearTimeout(timeout);
@@ -20,9 +20,9 @@ const SearchBar = ({ questions, searchResult }) => {
     };
   }, []);
 
-  // Handle onChange event of the search input and debounce the execution of the search
+  // Handle onChange event of search input and delayed the execution of the search
   const handleOnChange = useCallback(
-    debounce((e) => {
+    delayed((e) => {
       const keyword = e.target.value.trim().toLowerCase();
       setSearchTerm(keyword);
       setLoading(true);
