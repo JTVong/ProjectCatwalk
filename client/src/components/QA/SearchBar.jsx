@@ -20,7 +20,7 @@ const SearchBar = ({ questions, searchResult }) => {
     };
   }, []);
 
-  // Handle onChange event of search input and delayed the execution of the search
+  // Handle onChange search input event and delayed the execution of the search
   const handleOnChange = useCallback(
     delayed((e) => {
       const keyword = e.target.value.trim().toLowerCase();
@@ -30,7 +30,7 @@ const SearchBar = ({ questions, searchResult }) => {
     []
   );
 
-  // Update filteredQuestions state when the searchTerm changes
+  // Update filteredQuestions state when searchTerm changes
   useEffect(() => {
     setLoading(true);
   }, [searchTerm]);
