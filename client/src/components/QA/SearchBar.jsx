@@ -4,14 +4,14 @@ const SearchBar = ({ questions, searchResult }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Memoize filteredQuestions to avoid unnecessary re-renders
+  // Memorize filteredQuestions to avoid unnecessary re-renders
   const filteredQuestions = useMemo(() => {
     return questions.filter((q) =>
       q.question_body.toLowerCase().includes(searchTerm)
     );
   }, [questions, searchTerm]);
 
-  // Memoize delayed func to prevent it from being recreated on every re-render
+  // Memorize delayed func to prevent it from being recreated on every re-render
   const delayed = useCallback((func, delay) => {
     let timeout;
     return function (...args) {
