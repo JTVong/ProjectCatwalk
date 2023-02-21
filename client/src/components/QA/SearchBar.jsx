@@ -37,8 +37,9 @@ const SearchBar = ({ questions, searchResult }) => {
 
   // Call searchResult callback when the filteredQuestions or loading state changes
   useEffect(() => {
-    if (!loading) {
+    if (loading) {
       searchResult(filteredQuestions);
+      setLoading(false); // set loading back to false after searchResult is called
     }
   }, [filteredQuestions, loading, searchResult]);
 
