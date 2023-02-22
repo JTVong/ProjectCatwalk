@@ -1,50 +1,57 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getQuestions, updateQA } from '../../shared/api.js';
 import Questions from './Questions.jsx';
 
-const QAsection = ({ product_id , product_name}) => {
+const fetchData = async (product_id) => {
+  const res = await getQuestions({ product_id, count: 1000 });
+  const questions = res.data.results.sort(
+    (a, b) => b.question_helpfulness - a.question_helpfulness
+  );
+  questions.forEach((q) => {
+    const allAnswers = q.answers.sort(
+      (a, b) => b.helpfulness - a.helpfulness
+    );
+    const sellerAnswers = allAnswers.filter((el) => el.answerer_name === 'Seller');
+    q.answers = [...sellerAnswers, ...allAnswers];
+  });
+  return questions;
+};
 
+const QAsection = ({ product_id, product_name }) => {
   const [allQuestions, setQuestions] = useState([]);
-  const [update, setUpdate] = useState(false);
   const [reportedAns, setReportedAns] = useState([]);
 
   useEffect(() => {
-    const fetchData = () => {
-      getQuestions({ product_id, count: 1000 }).then(res => {
-        let questions = res.data.results;
-        questions.sort((a, b) =>
-          b.question_helpfulness - a.question_helpfulness
-        )
-        questions.forEach(q => {
-          let allAnswers = Object.entries(q.answers).sort((a,b) => b[1].helpfulness - a[1].helpfulness);
-          let sellerAnswers = allAnswers.filter((el,index) => {
-            if(el[1].answerer_name === 'Seller') {
-              return allAnswers.splice(index, 1);
-            }
-          })
-          q.answers = [...sellerAnswers, ...allAnswers];
-        })
-        setQuestions(questions);
-      });
-    }
-    fetchData();
-  }, [product_id, update]);
+    const fetchDataAsync = async () => {
+      const questions = await fetchData(product_id);
+      setQuestions(questions);
+    };
+    fetchDataAsync();
+  }, [product_id]);
 
-  useEffect(()=>{
-      if(reportedAns.length) {
-        reportedAns.forEach(id => updateQA({type:'answers', section:'report', id}))
+  const report = useCallback((id) => {
+    setReportedAns((prevReportedAns) => [...prevReportedAns, id]);
+    updateQA({ type: 'answers', section: 'report', ids: [id] });
+  }, []);
+
+  useEffect(() => {
+    const reportAnswers = async () => {
+      if (reportedAns.length) {
+        await updateQA({ type: 'answers', section: 'report', ids: reportedAns });
       }
-    }
-  , [product_id]);
-
-  const report = (id) => {
-    setReportedAns([...reportedAns, id]);
-  }
+    };
+    reportAnswers();
+  }, [reportedAns, product_id]);
 
   return (
-    <div id='main-QA' className='main-QA'>
-      <p id='header'>QUESTIONS & ANSWERS</p>
-      <Questions questions={allQuestions} product_id={product_id} product_name={product_name}  updateData={()=>setUpdate(!update)} report = {report} />
+    <div id="main-QA" className="main-QA">
+      <p id="header">QUESTIONS & ANSWERS</p>
+      <Questions
+        questions={allQuestions}
+        product_id={product_id}
+        product_name={product_name}
+        report={report}
+      />
     </div>
   );
 };
