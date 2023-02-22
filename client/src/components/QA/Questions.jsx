@@ -29,32 +29,40 @@ const Questions = ({questions, updateData, product_id, product_name, report}) =>
   document.body.style.overflow =   showPhoto.length ? 'hidden' : 'auto';
 
   const handleOnClick = (e) => {
-    if (e.target.tagName === 'SPAN' && ['Yes', 'Report'].includes(e.target.innerText.trim()) && e.target.getAttribute('voted') === 'false') {
-      const ansId = e.nativeEvent.path[1].getAttribute('ans_id');
-      const quesId = e.nativeEvent.path[2].getAttribute('q_id');
-      const type = ansId ? 'answers' : 'questions';
-      const section = e.target.innerText.trim() === 'Yes' ? 'helpful' : 'report';
-      const target = e.target;
-      section === 'report'
-        ? (()=> {
-            target.innerText = 'Reported';
-            report(ansId);
-          })()
-        : updateQA({type, section, id: ansId || quesId}).then(()=> {
-        target.setAttribute('voted', 'true')
-        updateData()});
-    } else if (e.target.tagName === 'BUTTON' && e.target.innerText.includes('ADD QUESTION')) {
-      document.querySelector('.form-wrapper').style.display = 'block';
-      document.querySelector('.question-form-container').style.display = 'block';
-    } else if(e.target.tagName === 'I') {
-      document.querySelector('.answer-form-wrapper').style.display = 'none';
-      document.querySelector('.form-wrapper').style.display = 'none';
-    } else if (e.target.tagName === 'SPAN' && e.target.innerText === 'Add Answer') {
-      setChosenQuestion([e.target.getAttribute('q_id'), e.target.getAttribute('q_body')]);
-      document.querySelector('.answer-form-wrapper').style.display = 'block';
-      document.querySelector('.answer-form-container').style.display = 'block';
+  const target = e.target;
+  const tagName = target.tagName;
+
+  if (tagName === 'SPAN' && ['Yes', 'Report'].includes(target.innerText.trim()) && target.getAttribute('voted') === 'false') {
+    const ansId = target.closest('[ans_id]').getAttribute('ans_id');
+    const quesId = target.closest('[q_id]').getAttribute('q_id');
+    const type = ansId ? 'answers' : 'questions';
+    const section = target.innerText.trim() === 'Yes' ? 'helpful' : 'report';
+
+    if (section === 'report') {
+      target.innerText = 'Reported';
+      report(ansId);
+    } else {
+      updateQA({type, section, id: ansId || quesId})
+        .then(() => {
+          target.setAttribute('voted', 'true');
+          updateData();
+        });
     }
+  } else if (tagName === 'BUTTON' && target.innerText.includes('ADD QUESTION')) {
+    const formWrapper = document.querySelector('.form-wrapper');
+    formWrapper.style.display = 'block';
+    document.querySelector('.question-form-container', formWrapper).style.display = 'block';
+  } else if (tagName === 'I') {
+    document.querySelector('.answer-form-wrapper').style.display = 'none';
+    document.querySelector('.form-wrapper').style.display = 'none';
+  } else if (tagName === 'SPAN' && target.innerText === 'Add Answer') {
+    setChosenQuestion([target.getAttribute('q_id'), target.getAttribute('q_body')]);
+    const answerFormWrapper = document.querySelector('.answer-form-wrapper');
+    answerFormWrapper.style.display = 'block';
+    document.querySelector('.answer-form-container', answerFormWrapper).style.display = 'block';
   }
+};
+
 
   const showMoreQuestions = () => {
     let length = showQuestions.length;
